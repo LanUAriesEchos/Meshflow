@@ -57,7 +57,15 @@ void ClientApp::parseArgs()
     const QStringList addresses = addressList.split(',', Qt::SkipEmptyParts);
 
     for (const QString &addr : addresses) {
-      const QString trimmedAddr = addr.trimmed();
+      QString trimmedAddr = addr.trimmed();
+
+      // tolerate a saved "name (address)" label from the server picker
+      if (const auto open = trimmedAddr.indexOf(QStringLiteral(" (")); open > 0 && trimmedAddr.endsWith(')')) {
+        trimmedAddr = trimmedAddr.mid(open + 2, trimmedAddr.size() - open - 3).trimmed();
+        if (trimmedAddr.startsWith(QStringLiteral("::ffff:"), Qt::CaseInsensitive))
+          trimmedAddr = trimmedAddr.mid(7);
+      }
+
       if (trimmedAddr.isEmpty()) {
         continue;
       }

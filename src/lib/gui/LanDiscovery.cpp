@@ -93,7 +93,12 @@ void LanDiscovery::readDatagrams()
     if (name.isEmpty())
       continue;
 
-    const auto address = datagram.senderAddress().toString();
+    // report plain IPv4 rather than the IPv4-mapped IPv6 form (::ffff:a.b.c.d) and drop any IPv6 zone id
+    auto sender = datagram.senderAddress();
+    sender.setScopeId(QString());
+    bool isV4 = false;
+    const quint32 v4 = sender.toIPv4Address(&isV4);
+    const auto address = isV4 ? QHostAddress(v4).toString() : sender.toString();
     const auto previous = m_servers.value(name);
     m_servers[name] = address;
     if (previous != address) {

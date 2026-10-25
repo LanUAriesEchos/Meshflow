@@ -402,10 +402,12 @@ void MainWindow::connectSlots()
 
   connect(ui->comboRemoteHost->lineEdit(), &QLineEdit::returnPressed, ui->btnRestartCore, &QPushButton::click);
   connect(ui->comboRemoteHost, &QComboBox::currentTextChanged, this, &MainWindow::remoteHostChanged);
+  // never let autocomplete turn the field into a "name (address)" label; a discovered server resolves by address
+  ui->comboRemoteHost->setCompleter(nullptr);
   connect(ui->comboRemoteHost, &QComboBox::activated, this, [this](int index) {
-    const auto name = ui->comboRemoteHost->itemData(index).toString();
-    if (!name.isEmpty())
-      ui->comboRemoteHost->setCurrentText(name);
+    const auto address = ui->comboRemoteHost->itemData(index, Qt::UserRole + 1).toString();
+    if (!address.isEmpty())
+      ui->comboRemoteHost->setCurrentText(address);
   });
 
   connect(ui->btnSaveServerConfig, &QPushButton::clicked, this, &MainWindow::saveServerConfig);
@@ -1149,10 +1151,13 @@ void MainWindow::onDiscoveredServer(const QString &screenName, const QString &ad
 
   const auto label = QStringLiteral("%1 (%2)").arg(screenName, address);
   const int i = ui->comboRemoteHost->findData(screenName);
-  if (i < 0)
+  if (i < 0) {
     ui->comboRemoteHost->addItem(label, screenName);
-  else
+    ui->comboRemoteHost->setItemData(ui->comboRemoteHost->count() - 1, address, Qt::UserRole + 1);
+  } else {
     ui->comboRemoteHost->setItemText(i, label);
+    ui->comboRemoteHost->setItemData(i, address, Qt::UserRole + 1);
+  }
 }
 
 void MainWindow::updateAnnounceState()
@@ -1459,8 +1464,19 @@ void MainWindow::toggleCanRunCore(bool enableButtons)
   m_actionStopCore->setEnabled(enableButtons && isStarted);
 }
 
-void MainWindow::remoteHostChanged(const QString &newRemoteHost)
+void MainWindow::remoteHostChanged(const QString &text)
 {
+  // a pasted/selected "name (address)" label becomes just the address
+  QString newRemoteHost = text;
+  static const QRegularExpression label(QStringLiteral(R"(^\s*\S+\s+\((.+)\)\s*$)"));
+  if (const auto m = label.match(text); m.hasMatch()) {
+    newRemoteHost = m.captured(1).trimmed();
+    if (newRemoteHost.startsWith(QStringLiteral("::ffff:"), Qt::CaseInsensitive))
+      newRemoteHost = newRemoteHost.mid(7);
+    ui->comboRemoteHost->setCurrentText(newRemoteHost);
+    return;
+  }
+
   m_coreProcess.setAddress(newRemoteHost);
   toggleCanRunCore(!newRemoteHost.isEmpty() && ui->rbModeClient->isChecked());
   if (newRemoteHost.isEmpty()) {
