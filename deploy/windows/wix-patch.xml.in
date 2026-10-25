@@ -1,0 +1,87 @@
+<CPackWiXPatch>
+  <CPackWiXFragment Id="CM_CP_meshflow_daemon.exe">
+    <ServiceInstall
+      Id="ServiceInstall"
+      Name="Meshflow"
+      DisplayName="Meshflow"
+      Description="Runs the Core process on secure desktops (UAC prompts, login screen, etc)."
+      ErrorControl="normal"
+      Start="auto"
+      Type="ownProcess">
+      <util:ServiceConfig
+        ResetPeriodInDays="1"
+        RestartServiceDelayInSeconds="1"
+        FirstFailureActionType="restart"
+        SecondFailureActionType="restart"
+        ThirdFailureActionType="none"
+      />
+    </ServiceInstall>
+    <ServiceControl Id="ServiceControl" Name="Meshflow" Remove="uninstall" Start="install" Stop="both"/>
+    <RemoveFile Id="RmOldLog" On="install" Name="meshflow-daemon.log"/>
+  </CPackWiXFragment>
+
+  <CPackWiXFragment Id="CM_CP_meshflow_core.exe">
+    <firewall:FirewallException Id="ServerFirewallException" Name="Meshflow Server" Program="[INSTALL_ROOT]meshflow-core.exe" Scope="any"/>
+    <firewall:FirewallException Id="ClientFirewallException" Name="Meshflow Client" Program="[INSTALL_ROOT]meshflow-core.exe" Scope="any"/>
+  </CPackWiXFragment>
+
+  <CPackWiXFragment Id="CM_CP_meshflow.exe">
+    <firewall:FirewallException Id="DiscoveryFirewallException" Name="Meshflow Discovery" Program="[INSTALL_ROOT]meshflow.exe" Scope="localSubnet"/>
+  </CPackWiXFragment>
+
+  <CPackWiXFragment Id="#PRODUCT">
+
+    <!-- Force file rewrite on upgrades: older installs may ship newer-versioned
+         Qt/OpenSSL DLLs, and 'a' reinstalls files regardless of version. -->
+    <Property Id="REINSTALLMODE" Value="amus" />
+
+    <!--
+      Close any running Meshflow processes before file replacement so the
+      installer does not have to schedule files for replace-on-reboot.
+      Legacy names (meshflow-server.exe, meshflow-client.exe) are still
+      listed so upgrades from pre-1.24 installs (separate server/client
+      binaries) also complete without prompting for a reboot.
+    -->
+    <util:CloseApplication
+      Id="CloseMeshflowGui"
+      Target="meshflow.exe"
+      CloseMessage="yes"
+      RebootPrompt="no"
+      TerminateProcess="10" />
+    <util:CloseApplication
+      Id="CloseMeshflowCore"
+      Target="meshflow-core.exe"
+      CloseMessage="yes"
+      RebootPrompt="no"
+      TerminateProcess="10" />
+    <util:CloseApplication
+      Id="CloseMeshflowServer"
+      Target="meshflow-server.exe"
+      CloseMessage="yes"
+      RebootPrompt="no"
+      TerminateProcess="10" />
+    <util:CloseApplication
+      Id="CloseMeshflowClient"
+      Target="meshflow-client.exe"
+      CloseMessage="yes"
+      RebootPrompt="no"
+      TerminateProcess="10" />
+
+    <UI>
+       <Publish Dialog="ExitDialog"
+           Control="Finish"
+           Event="DoAction"
+           Value="RunMeshflow"
+           Condition= "WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed" />
+       <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
+       <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Run Meshflow when finished" />
+    </UI>
+    <CustomAction
+      Id="RunMeshflow"
+      ExeCommand="[INSTALL_ROOT]meshflow.exe"
+      Directory="INSTALL_ROOT"
+      Execute="immediate"
+      Impersonate="yes"
+      Return="asyncNoWait" />
+  </CPackWiXFragment>
+</CPackWiXPatch>

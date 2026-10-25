@@ -1,0 +1,72 @@
+# SPDX-FileCopyrightText: 2025 Rimora Studio
+# SPDX-License-Identifier: MIT
+
+version = 1
+SPDX-PackageName = "meshflow"
+SPDX-PackageSupplier = "Rimora Studio"
+SPDX-PackageDownloadLocation = "https://github.com/RimoraStudio/Aether"
+
+[[annotations]]
+path = [
+   ".github/**"
+ , ".clang-format"
+ , ".editorconfig"
+ , ".gitattributes"
+ , ".gitignore"
+ , "cspell.json"
+ , "sonar-project.properties"
+ , "cmake/vcpkg.json.in"
+ , "**/*.md"
+ , "docs/**"
+ , "deploy/linux/flatpak/**"
+ , "deploy/linux/org.meshflow.meshflow.metainfo.xml"
+ , "deploy/windows/wix-patch.xml.in"
+ , "src/apps/meshflow-client/meshflow-client.exe.manifest"
+ , "src/apps/meshflow-core/meshflow-core.exe.manifest"
+ , "src/apps/meshflow-server/meshflow-server.exe.manifest"
+ , "src/apps/res/manpage.txt"
+ , "src/apps/res/meshflow.plist.in"
+ , "src/apps/res/entitlements-dev.plist"
+ , "translations/*.ts"
+]
+SPDX-FileCopyrightText = "Rimora Studio"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = [
+   "deploy/mac/dmg-background.tiff"
+ , "deploy/mac/dmg-volume.icns"
+ , "deploy/linux/org.meshflow.meshflow.png"
+ , "deploy/windows/wix-banner.png"
+ , "deploy/windows/wix-dialog.png"
+ , "src/apps/res/icons/meshflow-**/apps/64/meshflow*.svg"
+ , "src/apps/res/image/welcome.png"
+ , "src/apps/res/Meshflow.icns"
+ , "src/apps/res/meshflow.ico"
+ , "src/apps/res/meshflow.qrc"
+]
+SPDX-FileCopyrightText = "Rimora Studio"
+SPDX-License-Identifier = "GPL-2.0-only"
+
+[[annotations]]
+path = "src/apps/res/icons/meshflow-**/**/**/**.svg"
+SPDX-FileCopyrightText = "Kde Breeze Icons"
+SPDX-License-Identifier = "LGPL-2.1-only"
+
+[[annotations]]
+path = "src/apps/res/icons/meshflow-**/index.theme"
+SPDX-FileCopyrightText = "Chris Rizzitello <sithlord48@gmail.com>"
+SPDX-License-Identifier = "LGPL-2.1-only"
+
+[[annotations]]
+path = "src/apps/res/themes/*.json"
+SPDX-FileCopyrightText = "Olivier Cléro"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = [
+   "src/lib/gui/MainWindow.ui"
+ , "src/lib/gui/dialogs/*.ui"
+]
+SPDX-FileCopyrightText = "Rimora Studio"
+SPDX-License-Identifier = "GPL-2.0-only WITH LicenseRef-OpenSSL-Exception"

@@ -1,0 +1,19 @@
+{
+  "name": "docs",
+  "version": "1.0.0",
+  "description": "Meshflow is a free and open-source keyboard and mouse sharing app. Use the keyboard, mouse, or trackpad of one computer to control nearby computers and work seamlessly between them.",
+  "main": "index.js",
+  "scripts": {
+    "build": "tailwindcss -i src/input.css -o assets/site.css --minify",
+    "watch": "tailwindcss -i src/input.css -o assets/site.css --watch",
+    "serve": "python -m http.server 8000"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "tailwindcss": "^4.3.3"
+  }
+}

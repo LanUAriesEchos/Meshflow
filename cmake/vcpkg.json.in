@@ -1,0 +1,11 @@
+{
+  "$comment": "Generated file do not hand edit",
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "meshflow",
+  "version": "@MESHFLOW_VERSION_MAJOR@.@MESHFLOW_VERSION_MINOR@.@MESHFLOW_VERSION_PATCH@.@MESHFLOW_VERSION_TWEAK@",
+  "builtin-baseline": "d5ec528843d29e3a52d745a64b469f810b2cedbf",
+  "dependencies": [
+    "openssl"
+    @QT_LIBS@
+  ]
+}

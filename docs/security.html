@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <meta property="og:image" content="assets/og-image.png">
+  <title>Security Policy - Meshflow</title>
+  <meta name="description" content="Meshflow security policy and vulnerability reporting.">
+  <meta property="og:title" content="Security Policy - Meshflow">
+  <meta property="og:description" content="Meshflow security policy and vulnerability reporting.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Space+Grotesk:wght@700&family=Fira+Code&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/site.css">
+<script>const t=localStorage.getItem("meshflow-theme");if(t)document.documentElement.setAttribute("data-theme",t);else if(window.matchMedia("(prefers-color-scheme: dark)").matches)document.documentElement.setAttribute("data-theme","dark");</script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo"><svg width="28" height="28" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="meshflow-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#meshflow-grad)"/>
+  <circle cx="24" cy="32" r="13" fill="#fff"/>
+  <circle cx="40" cy="32" r="13" fill="#fff" fill-opacity="0.45"/>
+</svg> Meshflow</a>
+    <div class="nav-links">
+      <a href="index.html" class="">Home</a>
+      <a href="download.html" class="">Download</a>
+      <a href="docs.html" class="active">Docs</a>
+      <a href="about.html" class="">About</a>
+      <a href="https://github.com/RimoraStudio/Aether" target="_blank" rel="noopener">Source</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <button class="mobile-toggle" aria-label="Menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+  <div id="mobile-menu">
+    <a href="index.html">Home</a>
+      <a href="download.html">Download</a>
+      <a href="docs.html">Docs</a>
+      <a href="about.html">About</a>
+    <a href="https://github.com/RimoraStudio/Aether" target="_blank" rel="noopener">Source</a>
+  </div>
+</nav>
+<main>
+
+<div class="reading-progress"></div>
+<div class="doc-content">
+  <a href="docs.html" class="doc-back">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to docs
+  </a>
+  <div id="doc-render"></div>
+</div>
+<script>
+fetch('Security.md')
+  .then(r => r.text())
+  .then(md => {
+    // fix internal .md links to .html
+    md = md.replace(/Configuration\.md/g, 'configuration.html')
+           .replace(/HelpMain\.md/g, 'helpmain.html')
+           .replace(/Issues\.md/g, 'issues.html')
+           .replace(/Security\.md/g, 'security.html')
+           .replace(/dev\/build\.md/g, 'build.html')
+           .replace(/build\.md/g, 'build.html')
+           .replace(/dev\/protocol_reference\.md/g, 'protocol-reference.html')
+           .replace(/protocol_reference\.md/g, 'protocol-reference.html')
+           .replace(/Readme\.md/g, 'index.html');
+    document.getElementById('doc-render').innerHTML = marked.parse(md);
+  })
+  .catch(() => {
+    document.getElementById('doc-render').innerHTML = '<p style="color:var(--text-muted);">Failed to load document.</p>';
+  });
+</script>
+</main>
+<footer class="reveal">
+  <div class="footer-inner">
+    <p>&copy; Rimora Studio. Open source under GPL-2.0 with OpenSSL exception.</p>
+    <div class="footer-links">
+      <a href="docs.html">Docs</a>
+      <a href="https://github.com/RimoraStudio/Aether" target="_blank" rel="noopener">Source</a>
+    </div>
+  </div>
+</footer>
+<button class="scroll-top" aria-label="Scroll to top">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+<script src="assets/site.js"></script>
+</body>
+</html>

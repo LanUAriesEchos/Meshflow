@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+SPDX-FileCopyrightText: (C) 2025 - 2026 Rimora Studio
+SPDX-License-Identifier: MIT
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Bundle
+    Name="Meshflow"
+    Version="@CMAKE_PROJECT_VERSION@"
+    Manufacturer="@CMAKE_PROJECT_VENDOR@"
+    UpgradeCode="8A3C2E1F-5B4D-4E6A-9C8B-7D6E5F4A3B2C"
+    IconSourceFile="@MY_DIR@/meshflow.ico">
+
+    <BootstrapperApplication>
+      <bal:WixStandardBootstrapperApplication
+        xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal"
+        LicenseUrl="https://github.com/RimoraStudio/Aether/blob/main/LICENSE"
+        LogoFile="@MY_DIR@/bundle-logo.png"
+        LogoSideFile="@MY_DIR@/logoside.png"
+        LaunchTarget="[ProgramFiles6432Folder]Meshflow\meshflow.exe"
+        ShowVersion="yes"
+        Theme="hyperlinkSidebarLicense" />
+    </BootstrapperApplication>
+
+    <Chain>
+      <MsiPackage
+        SourceFile="@MESHFLOW_PKG_DIR@/meshflow-@PACKAGE_VERSION_LABEL@-@OS_STRING@.msi"
+        Compressed="yes" />
+    </Chain>
+  </Bundle>
+</Wix>

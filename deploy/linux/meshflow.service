@@ -1,0 +1,19 @@
+﻿# SPDX-FileCopyrightText: (C) 2026 Rimora Studio
+# SPDX-License-Identifier: MIT
+
+[Unit]
+Description=Meshflow keyboard and mouse sharing
+Documentation=https://github.com/RimoraStudio/Aether
+After=graphical-session.target
+PartOf=graphical-session.target
+ConditionEnvironment=|DISPLAY
+ConditionEnvironment=|WAYLAND_DISPLAY
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/meshflow --background
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=graphical-session.target

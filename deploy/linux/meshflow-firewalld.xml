@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+SPDX-FileCopyrightText: (C) 2026 Rimora Studio
+SPDX-License-Identifier: MIT
+-->
+<service>
+  <short>Meshflow</short>
+  <description>Meshflow keyboard and mouse sharing between computers.</description>
+  <port protocol="tcp" port="24800"/>
+</service>

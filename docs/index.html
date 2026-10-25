@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google-site-verification" content="nnIRoU4klHz61A4QIUiZyc4RS7DaTweEl9GlC_7CXpc" />
+  <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="canonical" href="https://rimorastudio.github.io/Aether/">
+  <meta property="og:image" content="https://rimorastudio.github.io/Aether/assets/og-image.png">
+  <meta name="twitter:image" content="https://rimorastudio.github.io/Aether/assets/og-image.png">
+  <title>Meshflow: one workspace, many computers</title>
+  <meta name="description" content="Meshflow connects your computers into one workspace. Share a keyboard and mouse across Windows, macOS, and Linux, keep each machine doing what it does best. No KVM, no cloud, no subscription.">
+  <meta property="og:title" content="Meshflow: one workspace, many computers">
+  <meta property="og:description" content="Share one keyboard and mouse across all your machines. Each computer keeps its own CPU, GPU, and apps. Meshflow just connects them.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rimorastudio.github.io/Aether/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Meshflow: one workspace, many computers">
+  <meta name="twitter:description" content="Share one keyboard and mouse across all your machines. Each computer keeps its own CPU, GPU, and apps. Meshflow just connects them.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Space+Grotesk:wght@700&family=Fira+Code&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/site.css">
+<script>document.documentElement.classList.remove('no-js');const t=localStorage.getItem("meshflow-theme");if(t)document.documentElement.setAttribute("data-theme",t);else if(window.matchMedia("(prefers-color-scheme: dark)").matches)document.documentElement.setAttribute("data-theme","dark");</script>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo" aria-label="Meshflow home"><svg width="28" height="28" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="meshflow-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#meshflow-grad)"/>
+  <circle cx="24" cy="32" r="13" fill="#fff"/>
+  <circle cx="40" cy="32" r="13" fill="#fff" fill-opacity="0.45"/>
+</svg> Meshflow</a>
+    <div class="nav-links">
+      <a href="index.html" class="active">Home</a>
+      <a href="download.html">Download</a>
+      <a href="docs.html">Docs</a>
+      <a href="about.html">About</a>
+      <a href="https://github.com/RimoraStudio/Aether" target="_blank" rel="noopener">Source</a>
+    </div>
+    <div class="nav-actions">
+      <button class="theme-toggle" aria-label="Toggle theme" aria-pressed="false">
+        <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <button class="mobile-toggle" aria-label="Menu" aria-expanded="false" aria-controls="mobile-menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+  <div id="mobile-menu" class="closed">
+    <a href="index.html">Home</a>
+      <a href="download.html">Download</a>
+      <a href="docs.html">Docs</a>
+      <a href="about.html">About</a>
+    <a href="https://github.com/RimoraStudio/Aether" target="_blank" rel="noopener">Source</a>
+  </div>
+</nav>
+<main id="main">
+<header class="hero">
+  <div class="hero-content">
+    <div class="reveal">
+      <p class="hero-eyebrow">Open source, cross-platform distributed workspace</p>
+      <h1 class="hero-title">One desk.<br><span class="gradient-text">Many computers.</span> One workspace.</h1>
+      <p class="hero-desc">Your desktop, laptop, and workstation each have their own CPU, GPU, and memory. Meshflow lets them cooperate as one workspace. Share a single keyboard and mouse across every machine, move the cursor from screen to screen, copy and paste between systems, and keep each device doing what it does best. No KVM switch, no cloud, no subscription.</p>
+      <div class="cta-row">
+        <a href="download.html" class="btn btn-primary">Download Meshflow</a>
+        <a href="about.html" class="btn btn-secondary">See the vision</a>
+      </div>
+    </div>
+    <div class="hero-visual reveal">
+      <svg class="hero-svg" viewBox="0 0 420 200" fill="none" aria-hidden="true">
+        <g>
+          <rect x="20" y="20" width="160" height="100" rx="6" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"/>
+          <rect x="28" y="28" width="144" height="84" rx="3" fill="var(--bg)"/>
+          <rect x="28" y="28" width="144" height="12" rx="3" fill="var(--surface)"/>
+          <circle cx="36" cy="34" r="2.5" fill="#ef4444" opacity="0.7"/>
+          <circle cx="44" cy="34" r="2.5" fill="#eab308" opacity="0.7"/>
+          <circle cx="52" cy="34" r="2.5" fill="#22c55e" opacity="0.7"/>
+          <rect x="36" y="48" width="80" height="4" rx="2" fill="var(--border)"/>
+          <rect x="36" y="58" width="60" height="3" rx="1.5" fill="var(--border)" opacity="0.6"/>
+          <rect x="36" y="66" width="100" height="3" rx="1.5" fill="var(--border)" opacity="0.6"/>
+          <rect x="36" y="74" width="70" height="3" rx="1.5" fill="var(--border)" opacity="0.6"/>
+          <rect id="btn-1" x="36" y="86" width="50" height="14" rx="3" fill="var(--primary)" opacity="0.15" class="click-target"/>
+          <rect x="88" y="120" width="24" height="8" fill="var(--border)"/>
+          <rect x="78" y="128" width="44" height="4" rx="2" fill="var(--border)"/>
+        </g>
+        <g>
+          <rect x="240" y="20" width="160" height="100" rx="6" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"/>
+          <rect x="248" y="28" width="144" height="84" rx="3" fill="var(--bg)"/>
+          <rect x="248" y="28" width="144" height="12" rx="3" fill="var(--surface)"/>
+          <circle cx="256" cy="34" r="2.5" fill="#ef4444" opacity="0.7"/>
+          <circle cx="264" cy="34" r="2.5" fill="#eab308" opacity="0.7"/>
+          <circle cx="272" cy="34" r="2.5" fill="#22c55e" opacity="0.7"/>
+          <rect x="256" y="48" width="80" height="4" rx="2" fill="var(--border)"/>
+          <rect x="256" y="58" width="100" height="3" rx="1.5" fill="var(--border)" opacity="0.6"/>
+          <rect x="256" y="66" width="60" height="3" rx="1.5" fill="var(--border)" opacity="0.6"/>
+          <rect x="256" y="74" width="90" height="3" rx="1.5" fill="var(--border)" opacity="0.6"/>
+          <rect id="btn-2" x="256" y="86" width="50" height="14" rx="3" fill="var(--primary)" opacity="0.15" class="click-target"/>
+          <rect x="308" y="120" width="24" height="8" fill="var(--border)"/>
+          <rect x="298" y="128" width="44" height="4" rx="2" fill="var(--border)"/>
+        </g>
+        <path class="beam" d="M180 70 L240 70"/>
+        <circle id="ripple-1" cx="61" cy="93" r="0" fill="none" stroke="var(--primary)" stroke-width="2" opacity="0" class="ripple"/>
+        <circle id="ripple-2" cx="281" cy="93" r="0" fill="none" stroke="var(--primary)" stroke-width="2" opacity="0" class="ripple"/>
+        <circle id="trail" cx="0" cy="0" r="8" fill="var(--primary)" opacity="0" class="cursor-trail"/>
+        <g class="cursor-g">
+          <path d="M0 0 L0 16 L4 12 L7 18 L10 17 L7 11 L12 11 Z" fill="var(--primary)" stroke="var(--bg)" stroke-width="1.5" stroke-linejoin="round"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<section class="section section-flush-top">
+  <div class="container">
+    <div class="stats-bar reveal">
+      <div class="stat-item">
+        <div class="stat-number"><span data-count="3">0</span><span class="stat-suffix">+</span></div>
+        <div class="stat-label">Platforms supported</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number"><span data-count="0">0</span></div>
+        <div class="stat-label">Cloud accounts needed</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number"><span data-count="100">0</span><span class="stat-suffix">%</span></div>
+        <div class="stat-label">Local, peer-to-peer</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number"><span data-count="7">0</span></div>
+        <div class="stat-label">UI languages</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container">
+    <h2 class="section-title reveal">Built for <span class="gradient-text">distributed</span> workflows</h2>
+    <p class="section-sub reveal">Each machine keeps its own compute power. Meshflow handles the coordination.</p>
+    <div class="grid-3">
+      <div class="card card-hover magic-card reveal">
+        <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+        <h3>One keyboard, every machine</h3>
+        <p>Drag the cursor off one screen and onto another without pressing any buttons. Meshflow tracks edge positions so the transition feels instant and natural. No KVM switch, no cable swapping.</p>
+      </div>
+      <div class="card card-hover magic-card reveal">
+        <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></div>
+        <h3>Shared clipboard</h3>
+        <p>Copy and paste text and images between systems automatically. Your clipboard content travels with the cursor as it crosses screen boundaries. No file sharing, no cloud sync.</p>
+      </div>
+      <div class="card card-hover magic-card reveal">
+        <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <h3>TLS encrypted</h3>
+        <p>Server and client traffic is encrypted with TLS to keep your input data private. Meshflow generates and manages certificates for you automatically. Nothing leaves your local network.</p>
+      </div>
+      <div class="card card-hover magic-card reveal">
+        <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+        <h3>Cross-platform</h3>
+        <p>Windows, macOS, and Linux. X11 and Wayland are both supported on Linux, so Meshflow works across mixed-OS setups without compromise.</p>
+      </div>
+      <div class="card card-hover magic-card reveal">
+        <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+        <h3>Synergy and Barrier compatible</h3>
+        <p>Works with the Synergy and Barrier wire protocols for broad interoperability. Connect Meshflow to existing Synergy or Barrier clients and servers without replacing everything at once.</p>
+      </div>
+      <div class="card card-hover magic-card reveal">
+        <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <h3>Each machine stays useful</h3>
+        <p>Unlike remote desktop tools that centralize everything on one machine, Meshflow keeps each computer independent. Your laptop runs its own apps. Your desktop runs its own apps. Meshflow just connects them.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-divider">
+  <div class="container">
+    <h2 class="section-title reveal">How it works</h2>
+    <p class="section-sub reveal">Meshflow runs as a server on your primary machine and as a client on each secondary machine.</p>
+    <div class="grid-3">
+      <div class="card step reveal">
+        <div class="step-num">1</div>
+        <h3>Install</h3>
+        <p>Download and install Meshflow on every computer you want to connect.</p>
+      </div>
+      <div class="card step reveal">
+        <div class="step-num">2</div>
+        <h3>Configure</h3>
+        <p>Set one machine as server, arrange screens in the GUI, and add clients by hostname.</p>
+      </div>
+      <div class="card step reveal">
+        <div class="step-num">3</div>
+        <h3>Share</h3>
+        <p>Move your cursor across screen edges. One keyboard and mouse, many computers.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container">
+    <h2 class="section-title reveal">Real desks, <span class="gradient-text">real workflows</span></h2>
+    <p class="section-sub reveal">Meshflow is not just for switching between machines. It is for people who use several computers at once.</p>
+    <div class="grid-2">
+      <div class="card card-hover reveal">
+        <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+        <h3>The developer desk</h3>
+        <p>A powerful desktop runs Docker, AI inference, and build jobs. A laptop handles the browser, Slack, and email. Meshflow lets you move between them with one keyboard and paste code snippets from the laptop straight into the desktop terminal. Each machine does what it is best at. No remote desktop, no rendering overhead.</p>
+      </div>
+      <div class="card card-hover reveal">
+        <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+        <h3>The multi-OS workstation</h3>
+        <p>A Windows gaming PC, a Linux dev box, and a Mac for design work. Meshflow connects all three over your LAN with native input capture on each platform. Move the cursor from a Windows game to a Linux terminal to a Mac design tool without touching a KVM switch.</p>
+      </div>
+      <div class="card card-hover reveal">
+        <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+        <h3>The home server setup</h3>
+        <p>A desktop for daily work, a headless home server running background services, and a laptop on the couch. Meshflow reaches all of them. Check on a build, paste a config change, and jump back to the laptop without leaving your seat.</p>
+      </div>
+      <div class="card card-hover reveal">
+        <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+        <h3>The mixed-environment tester</h3>
+        <p>Test your app on Windows, Linux, and macOS at the same time. Copy a URL from your main machine and paste it into a browser on each test machine. Meshflow keeps the clipboard in sync across all of them, so cross-platform testing stops being a context-switching chore.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-divider">
+  <div class="container">
+    <h2 class="section-title reveal">See it in action</h2>
+    <p class="section-sub reveal">Click a hotspot to watch how Meshflow moves your cursor, clipboard, and input between machines.</p>
+    <div class="demo-container reveal">
+      <div class="demo-stage">
+        <div class="demo-screens" id="demo-screens">
+          <div class="demo-screen active" data-screen="server">
+            <div class="demo-screen-bar"><span></span><span></span><span></span></div>
+            <div class="demo-screen-body">
+              <div class="demo-text" id="demo-text-server">$ meshflow --server<br>Listening on :24800<br><span class="typed">Client connected.</span></div>
+            </div>
+            <div class="demo-screen-label">Workstation</div>
+            <div class="demo-screen-role">Server</div>
+          </div>
+          <div class="demo-beam">
+            <div class="demo-beam-pulse"></div>
+          </div>
+          <div class="demo-screen" data-screen="client">
+            <div class="demo-screen-bar"><span></span><span></span><span></span></div>
+            <div class="demo-screen-body">
+              <div class="demo-text" id="demo-text-client">$ meshflow --client<br>Connecting to server...<br><span class="typed">Connected.</span></div>
+            </div>
+            <div class="demo-screen-label">Laptop</div>
+            <div class="demo-screen-role">Client</div>
+          </div>
+          <div class="demo-cursor" id="demo-cursor">
+            <svg viewBox="0 0 12 18" fill="none" aria-hidden="true"><path d="M0 0 L0 14 L3.5 10.5 L6 16 L8 15 L5.5 9.5 L10 9.5 Z" fill="var(--primary)" stroke="var(--bg)" stroke-width="1"/></svg>
+          </div>
+        </div>
+        <div class="demo-hotspots">
+          <button class="demo-hotspot active" data-demo="cursor">
+            <span class="demo-hotspot-dot"></span>
+            Cursor crossing
+          </button>
+          <button class="demo-hotspot" data-demo="clipboard">
+            <span class="demo-hotspot-dot"></span>
+            Clipboard sharing
+          </button>
+          <button class="demo-hotspot" data-demo="encrypt">
+            <span class="demo-hotspot-dot"></span>
+            TLS encryption
+          </button>
+        </div>
+        <div class="demo-info">
+          <p class="demo-info-text" id="demo-info">Move your cursor to the edge of the server screen and it <strong>seamlessly appears</strong> on the client. No buttons, no shortcuts.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-divider">
+  <div class="container">
+    <h2 class="section-title reveal">Available on your <span class="gradient-text">platform</span></h2>
+    <p class="section-sub reveal">Native packages for every major desktop OS.</p>
+    <div class="grid-3 reveal">
+      <div class="card card-hover">
+        <div class="platform-card-header">
+          <div class="platform-card-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.1L9.5 4.2v6.9H3V5.1zM10.5 4.1L21 2.8v8.3H10.5V4.1zM3 12.9h6.5v6.9L3 18.9v-6zM10.5 12.9H21v8.3l-10.5-1.3v-7z"/></svg></div>
+          <div>
+            <h3>Windows</h3>
+            <p class="platform-card-sub">10 or later (x64)</p>
+          </div>
+        </div>
+        <ul class="platform-features">
+          <li>MSI installer</li>
+          <li>EXE bootstrapper</li>
+          <li>Portable 7z archive</li>
+        </ul>
+        <a href="download.html" class="btn btn-secondary btn-sm">Download</a>
+      </div>
+      <div class="card card-hover">
+        <div class="platform-card-header">
+          <div class="platform-card-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11"/></svg></div>
+          <div>
+            <h3>macOS</h3>
+            <p class="platform-card-sub">12 Monterey or later</p>
+          </div>
+        </div>
+        <ul class="platform-features">
+          <li>DMG installer</li>
+          <li>PKG installer</li>
+          <li>Portable tar.gz</li>
+        </ul>
+        <a href="download.html" class="btn btn-secondary btn-sm">Download</a>
+      </div>
+      <div class="card card-hover">
+        <div class="platform-card-header">
+          <div class="platform-card-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C8 2 5.5 4 5.5 7c0 1.2.4 2.2 1 3-1.5 0-3 1-3 3 0 3 3 5 8.5 5s8.5-2 8.5-5c0-2-1.5-3-3-3 .6-.8 1-1.8 1-3 0-3-2.5-5-6.5-5zm-2 4.5c.8 0 1.5.9 1.5 2s-.7 2-1.5 2-1.5-.9-1.5-2 .7-2 1.5-2zm4 0c.8 0 1.5.9 1.5 2s-.7 2-1.5 2-1.5-.9-1.5-2 .7-2 1.5-2zM12 12c2.5 0 4 1 4 2.5S14.5 17 12 17s-4-1-4-2.5S9.5 12 12 12z"/></svg></div>
+          <div>
+            <h3>Linux</h3>
+            <p class="platform-card-sub">X11 and Wayland</p>
+          </div>
+        </div>
+        <ul class="platform-features">
+          <li>DEB (Debian, Ubuntu)</li>
+          <li>RPM (Fedora, openSUSE)</li>
+          <li>Tar.gz (any distro)</li>
+        </ul>
+        <a href="download.html" class="btn btn-secondary btn-sm">Download</a>
+      </div>
+    </div>
+    <div class="grid-2 reveal mt-6">
+      <div class="card">
+        <div class="platform-card-header">
+          <div class="platform-card-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+          <div>
+            <h3>Synergy &amp; Barrier compatible</h3>
+            <p class="platform-card-sub">Protocol interoperable</p>
+          </div>
+        </div>
+        <p>Connect to existing Synergy or Barrier clients and servers. Mixed setups work out of the box.</p>
+      </div>
+      <div class="card">
+        <div class="platform-card-header">
+          <div class="platform-card-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+          <div>
+            <h3>7 UI languages</h3>
+            <p class="platform-card-sub">Localized interface</p>
+          </div>
+        </div>
+        <p>English, Italian, Spanish, Japanese, Korean, Russian, and Chinese.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-divider">
+  <div class="container">
+    <h2 class="section-title reveal">Frequently asked questions</h2>
+    <p class="section-sub reveal">Everything you need to know before getting started.</p>
+    <div class="faq-list reveal">
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          Is Meshflow really free?
+          <span class="faq-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">Yes. Meshflow is 100% free and open source under GPL-2.0 with an OpenSSL exception. No subscriptions, no paid tiers, no feature locks. The source code is available on GitHub for anyone to audit, modify, and contribute to.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          Do I need any hardware or a KVM switch?
+          <span class="faq-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">No hardware needed. Meshflow is software-only and works over your existing local network. Just install it on each machine, connect them, and you're ready. No KVM switch, no extra cables, no cloud account.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          Is my input data secure?
+          <span class="faq-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">All traffic between Meshflow server and clients is encrypted with TLS. Meshflow generates and manages certificates automatically, and supports fingerprint-based peer verification so you can confirm you're connecting to the right machine. Nothing leaves your local network.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          Can I use Meshflow with my existing Synergy or Barrier setup?
+          <span class="faq-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">Yes. Meshflow is built on the Synergy codebase and uses the same wire protocol. It works with existing Synergy and Barrier clients and servers, so you can mix Meshflow into your current setup without replacing everything at once.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          Does it work on Wayland?
+          <span class="faq-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">Yes. On Linux, Meshflow supports both X11 and Wayland. The correct backend is selected automatically based on your session type, so it works regardless of which display server you're running.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          How many computers can I connect?
+          <span class="faq-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">There's no hard limit. One machine acts as the server (with the shared keyboard and mouse), and you can connect as many client machines as your network can handle. Arrange them in the GUI grid to match your physical desk layout.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container section-center">
+    <div class="cta-card border-beam reveal">
+      <h2 class="section-title">Get Meshflow now</h2>
+      <p class="section-sub">Download the latest release or build from source in minutes.</p>
+      <div class="cta-row-center">
+        <a href="download.html" class="btn btn-primary">Go to downloads</a>
+        <a href="docs.html" class="btn btn-secondary">Read the docs</a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="reveal">
+  <div class="footer-inner">
+    <p>&copy; <span id="footer-year">2026</span> Rimora Studio. Open source under GPL-2.0 with OpenSSL exception.</p>
+    <div class="footer-links">
+      <a href="about.html">About</a>
+      <a href="docs.html">Docs</a>
+      <a href="download.html">Download</a>
+      <a href="https://github.com/RimoraStudio/Aether" target="_blank" rel="noopener">Source</a>
+    </div>
+  </div>
+</footer>
+<button class="scroll-top" aria-label="Scroll to top">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+<noscript><style>.reveal{opacity:1;transform:none;}</style></noscript>
+<script src="assets/site.js"></script>
+</body>
+</html>

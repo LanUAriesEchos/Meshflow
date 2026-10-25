@@ -1,0 +1,13 @@
+/*
+ * Meshflow -- mouse and keyboard sharing utility
+ * SPDX-FileCopyrightText: (C) 2024 Synergy App Ltd
+ * SPDX-License-Identifier: GPL-2.0-only WITH LicenseRef-OpenSSL-Exception
+ */
+
+#pragma once
+
+namespace meshflow::gui::diagnostic {
+
+void clearSettings(bool enableRestart);
+
+}
