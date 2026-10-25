@@ -85,6 +85,7 @@ MainWindow::MainWindow()
       m_actionRestartCore{new QAction(this)},
       m_actionStopCore{new QAction(this)},
       m_actionShowHelp{new QAction(this)},
+      m_actionCheckUpdates{new QAction(this)},
       m_networkMonitor{new NetworkMonitor(this)}
 {
   ui->setupUi(this);
@@ -362,6 +363,23 @@ void MainWindow::connectSlots()
   connect(m_actionRestartCore, &QAction::triggered, this, &MainWindow::resetCore);
   connect(m_actionStopCore, &QAction::triggered, this, &MainWindow::stopCore);
   connect(m_actionShowHelp, &QAction::triggered, this, &MainWindow::showHelpViewer);
+  connect(m_actionCheckUpdates, &QAction::triggered, this, &MainWindow::checkForUpdatesManually);
+  connect(&m_versionChecker, &VersionChecker::checkFinished, this, [this](bool available, const QString &v, const QString &err) {
+    if (!m_manualUpdateCheck)
+      return;
+    m_manualUpdateCheck = false;
+    if (!err.isEmpty()) {
+      QMessageBox::warning(this, tr("Check for updates"), tr("Could not check for updates:\n%1").arg(err));
+    } else if (available) {
+      const auto answer = QMessageBox::question(
+          this, tr("Check for updates"), tr("Version %1 is available. Open the download page?").arg(v)
+      );
+      if (answer == QMessageBox::Yes)
+        openGetNewVersionUrl();
+    } else {
+      QMessageBox::information(this, tr("Check for updates"), tr("You are running the latest version."));
+    }
+  });
 
   // Mac os tray will only show a menu
   if (!meshflow::platform::isMac())
@@ -566,6 +584,12 @@ void MainWindow::openGetNewVersionUrl() const
   QDesktopServices::openUrl(QUrl(kUrlDownload));
 }
 
+void MainWindow::checkForUpdatesManually()
+{
+  m_manualUpdateCheck = true;
+  m_versionChecker.checkLatest();
+}
+
 void MainWindow::openSettings()
 {
   auto dialog = SettingsDialog(this, m_serverConfig);
@@ -760,6 +784,16 @@ void MainWindow::open(bool startHidden)
 
   if (Settings::value(Settings::Gui::AutoUpdateCheck).toBool()) {
     m_versionChecker.checkLatest();
+    auto *updateTimer = findChild<QTimer *>("updateTimer");
+    if (!updateTimer) {
+    updateTimer = new QTimer(this);
+    updateTimer->setObjectName("updateTimer");
+    connect(updateTimer, &QTimer::timeout, this, [this] {
+      if (Settings::value(Settings::Gui::AutoUpdateCheck).toBool())
+        m_versionChecker.checkLatest();
+    });
+    updateTimer->start(4 * 60 * 60 * 1000);
+    }
   } else {
     qDebug() << "skipping check for new version, disabled";
   }
@@ -785,6 +819,7 @@ void MainWindow::createMenuBar()
 
   m_menuHelp->addAction(m_actionAbout);
   m_menuHelp->addAction(m_actionShowHelp);
+  m_menuHelp->addAction(m_actionCheckUpdates);
 
   auto menuBar = new QMenuBar(this);
   menuBar->addMenu(m_menuFile);
@@ -1266,6 +1301,7 @@ void MainWindow::updateText()
   m_actionAbout->setText(tr("About %1...").arg(kAppName));
 
   m_actionShowHelp->setText(tr("View &Help"));
+  m_actionCheckUpdates->setText(tr("Check for &Updates..."));
 
   //: start / restart core shortcut
   m_actionStartCore->setShortcut(QKeySequence(tr("Ctrl+S")));

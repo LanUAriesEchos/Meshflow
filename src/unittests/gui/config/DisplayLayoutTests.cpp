@@ -57,6 +57,26 @@ void DisplayLayoutTests::multiMonitorLinksUseOuterEdges()
   QCOMPARE(down->srcEnd, 1.0);
 }
 
+void DisplayLayoutTests::innerEdgeAboveCenterMonitorLinks()
+{
+  // friend's PC: left and right monitors stick up, the centre one is lower with empty space above it
+  Computer friendPc{
+      QRect(0, 0, 3000, 1080), {QRect(0, 0, 1000, 1080), QRect(1000, 200, 1000, 880), QRect(2000, 0, 1000, 1080)}
+  };
+  // my display sits in that empty space, right above the centre monitor
+  Computer mine{QRect(1000, 0, 1000, 200), {QRect(1000, 0, 1000, 200)}};
+  const auto links = computeLinks(QList<Computer>{friendPc, mine});
+
+  const auto *up = find(links, 0, Side::Up, 1);
+  QVERIFY(up);
+  QCOMPARE(up->srcStart, 1.0 / 3.0);
+  QCOMPARE(up->srcEnd, 2.0 / 3.0);
+  QVERIFY(find(links, 1, Side::Down, 0));
+
+  // the side monitors are not adjacent to it across open space, so no link to them
+  QCOMPARE(links.size(), 2);
+}
+
 void DisplayLayoutTests::partialOverlapProducesIntervals()
 {
   // a laptop (1000 high) sitting half way down the right side of a 2000 high monitor

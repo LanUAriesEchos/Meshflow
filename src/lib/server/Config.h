@@ -353,6 +353,19 @@ public:
   */
   const ScreenOptions *getOptions(const std::string &name) const;
 
+  //! Physical monitor rectangle of a screen, relative to the screen's top-left corner
+  struct MonitorRect
+  {
+    int32_t x = 0;
+    int32_t y = 0;
+    int32_t w = 0;
+    int32_t h = 0;
+    bool operator==(const MonitorRect &) const = default;
+  };
+
+  //! Get the monitors of a screen. Empty when the screen is a single rectangle.
+  const std::vector<MonitorRect> &getMonitors(const std::string &name) const;
+
   //! Get the shared ports whitelist
   /*!
   Returns the list of localhost TCP ports that forwarding clients
@@ -412,6 +425,7 @@ private:
   void readSectionScreens(ConfigReadContext &);
   void readSectionLinks(ConfigReadContext &);
   void readSectionAliases(ConfigReadContext &);
+  void readSectionMonitors(ConfigReadContext &);
 
   InputFilter::Condition *
   parseCondition(const ConfigReadContext &, const std::string &condition, const std::vector<std::string> &args);
@@ -429,6 +443,7 @@ private:
   NameMap m_nameToCanonicalName;
   NetworkAddress m_meshflowAddress;
   ScreenOptions m_globalOptions;
+  std::map<std::string, std::vector<MonitorRect>> m_monitors;
   std::vector<uint16_t> m_sharedPorts;
   InputFilter m_inputFilter;
   bool m_hasLockToScreenAction = false;

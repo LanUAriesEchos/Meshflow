@@ -17,6 +17,7 @@
 #include "server/Server.h"
 
 #include <assert.h>
+#include <cstdio>
 #include <cstdlib>
 #include <istream>
 #include <ostream>
@@ -327,6 +328,9 @@ bool Config::hasLockToScreenAction() const
 
 bool Config::operator==(const Config &x) const
 {
+  if (m_monitors != x.m_monitors) {
+    return false;
+  }
   if (m_meshflowAddress != x.m_meshflowAddress) {
     return false;
   }
@@ -413,6 +417,7 @@ void Config::readSection(ConfigReadContext &s)
   static const char s_screens[] = "screens";
   static const char s_links[] = "links";
   static const char s_aliases[] = "aliases";
+  static const char s_monitors[] = "monitors";
 
   std::string line;
   if (!s.readLine(line)) {
@@ -445,6 +450,8 @@ void Config::readSection(ConfigReadContext &s)
     readSectionAliases(s);
   } else if (name == s_links) {
     readSectionLinks(s);
+  } else if (name == s_monitors) {
+    readSectionMonitors(s);
   } else {
     throw ServerConfigReadException(s, "unknown section name \"%{1}\"", name);
   }
@@ -720,6 +727,56 @@ void Config::readSectionLinks(ConfigReadContext &s)
     }
   }
   throw ServerConfigReadException(s, "unexpected end of links section");
+}
+
+// section: monitors, one line per screen:  `<screen> = x,y,w,h;x,y,w,h` (relative to the screen origin)
+void Config::readSectionMonitors(ConfigReadContext &s)
+{
+  std::string line;
+  while (s.readLine(line)) {
+    if (line == "end") {
+      return;
+    }
+
+    const auto eq = line.find('=');
+    if (eq == std::string::npos || eq == 0) {
+      throw ServerConfigReadException(s, "monitors line must be `<screen> = x,y,w,h;...`");
+    }
+    auto trim = [](std::string v) {
+      const auto b = v.find_first_not_of(" \t");
+      const auto e = v.find_last_not_of(" \t");
+      return b == std::string::npos ? std::string() : v.substr(b, e - b + 1);
+    };
+    const std::string screen = trim(line.substr(0, eq));
+    const std::string value = trim(line.substr(eq + 1));
+
+    std::vector<MonitorRect> rects;
+    std::string::size_type pos = 0;
+    while (pos <= value.size()) {
+      auto end = value.find(';', pos);
+      if (end == std::string::npos)
+        end = value.size();
+      const std::string item = value.substr(pos, end - pos);
+      pos = end + 1;
+      if (item.empty())
+        continue;
+
+      MonitorRect r;
+      if (std::sscanf(item.c_str(), "%d,%d,%d,%d", &r.x, &r.y, &r.w, &r.h) != 4 || r.w <= 0 || r.h <= 0) {
+        throw ServerConfigReadException(s, "invalid monitor rectangle \"%{1}\"", item);
+      }
+      rects.push_back(r);
+    }
+    m_monitors[screen] = std::move(rects);
+  }
+  throw ServerConfigReadException(s, "unexpected end of monitors section");
+}
+
+const std::vector<Config::MonitorRect> &Config::getMonitors(const std::string &name) const
+{
+  static const std::vector<MonitorRect> none;
+  const auto it = m_monitors.find(name);
+  return it == m_monitors.end() ? none : it->second;
 }
 
 void Config::readSectionAliases(ConfigReadContext &s)

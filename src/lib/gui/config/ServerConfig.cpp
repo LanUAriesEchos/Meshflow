@@ -159,6 +159,22 @@ QTextStream &operator<<(QTextStream &outStream, const ServerConfig &config)
 
   outStream << "end" << Qt::endl << Qt::endl;
 
+  // physical monitor rectangles (relative to each computer), so the cursor can cross at inner edges
+  QString monitorLines;
+  const auto computers = config.layoutComputers();
+  for (int i = 0; i < config.screens().size() && i < computers.size(); i++) {
+    const auto &screen = config.screens()[i];
+    const auto &c = computers[i];
+    if (screen.isNull() || c.monitors.size() < 2)
+      continue;
+    QStringList parts;
+    for (const QRect &m : c.monitors)
+      parts << QStringLiteral("%1,%2,%3,%4").arg(m.x() - c.bounds.x()).arg(m.y() - c.bounds.y()).arg(m.width()).arg(m.height());
+    monitorLines += QStringLiteral("\t%1 = %2\n").arg(screen.name(), parts.join(QLatin1Char(';')));
+  }
+  if (!monitorLines.isEmpty())
+    outStream << "section: monitors" << Qt::endl << monitorLines << "end" << Qt::endl << Qt::endl;
+
   outStream << "section: links" << Qt::endl;
 
   const auto links = displaylayout::computeLinks(config.layoutComputers());

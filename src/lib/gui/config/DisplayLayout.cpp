@@ -93,17 +93,41 @@ QList<Link> computeLinks(const QList<Computer> &computers)
       if (i == j || !valid(b))
         continue;
 
-      // an edge is only usable where a monitor sits on the outer edge of its computer
+      // an edge is usable where it faces open space: no other monitor of the same computer touches it
+      const auto exposed = [&](const QList<QRect> &mons, const QRect &m, Side side) {
+        return std::ranges::none_of(mons, [&](const QRect &o) {
+          if (&o == &m)
+            return false;
+          switch (side) {
+          case Right:
+            return o.x() == right(m) && o.y() < bottom(m) && m.y() < bottom(o);
+          case Left:
+            return right(o) == m.x() && o.y() < bottom(m) && m.y() < bottom(o);
+          case Up:
+            return bottom(o) == m.y() && o.x() < right(m) && m.x() < right(o);
+          case Down:
+            return o.y() == bottom(m) && o.x() < right(m) && m.x() < right(o);
+          }
+          return false;
+        });
+      };
+
       for (const QRect &ma : computers[i].monitors) {
         for (const QRect &mb : computers[j].monitors) {
-          if (right(ma) == right(a) && mb.x() == b.x() && right(ma) == mb.x())
-            addLink(links, i, j, Right, a, b, overlap(ma.y(), bottom(ma), mb.y(), bottom(mb)));
-          if (ma.x() == a.x() && right(mb) == right(b) && right(mb) == ma.x())
-            addLink(links, i, j, Left, a, b, overlap(ma.y(), bottom(ma), mb.y(), bottom(mb)));
-          if (ma.y() == a.y() && bottom(mb) == bottom(b) && bottom(mb) == ma.y())
-            addLink(links, i, j, Up, a, b, overlap(ma.x(), right(ma), mb.x(), right(mb)));
-          if (bottom(ma) == bottom(a) && mb.y() == b.y() && bottom(ma) == mb.y())
-            addLink(links, i, j, Down, a, b, overlap(ma.x(), right(ma), mb.x(), right(mb)));
+          const auto yOverlap = overlap(ma.y(), bottom(ma), mb.y(), bottom(mb));
+          const auto xOverlap = overlap(ma.x(), right(ma), mb.x(), right(mb));
+          if (right(ma) == mb.x() && exposed(computers[i].monitors, ma, Right) &&
+              exposed(computers[j].monitors, mb, Left))
+            addLink(links, i, j, Right, a, b, yOverlap);
+          if (right(mb) == ma.x() && exposed(computers[i].monitors, ma, Left) &&
+              exposed(computers[j].monitors, mb, Right))
+            addLink(links, i, j, Left, a, b, yOverlap);
+          if (bottom(mb) == ma.y() && exposed(computers[i].monitors, ma, Up) &&
+              exposed(computers[j].monitors, mb, Down))
+            addLink(links, i, j, Up, a, b, xOverlap);
+          if (bottom(ma) == mb.y() && exposed(computers[i].monitors, ma, Down) &&
+              exposed(computers[j].monitors, mb, Up))
+            addLink(links, i, j, Down, a, b, xOverlap);
         }
       }
     }

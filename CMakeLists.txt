@@ -94,7 +94,7 @@ project(
   meshflow
   VERSION "${MESHFLOW_VERSION_MAJOR}.${MESHFLOW_VERSION_MINOR}.${MESHFLOW_VERSION_PATCH}.${MESHFLOW_VERSION_TWEAK}"
   DESCRIPTION "Keyboard and mouse sharing utility"
-  HOMEPAGE_URL "https://github.com/RimoraStudio/Aether"
+  HOMEPAGE_URL "https://github.com/LanUAriesEchos/Meshflow"
   LANGUAGES C CXX
 )
 
@@ -102,7 +102,7 @@ project(
 set(CMAKE_PROJECT_PROPER_NAME "Meshflow")
 set(CMAKE_PROJECT_VENDOR "Rimora Studio")
 set(CMAKE_PROJECT_COPYRIGHT "(C) 2025 - 2026 ${CMAKE_PROJECT_VENDOR}")
-set(CMAKE_PROJECT_CONTACT "Xeleste <maintainers@github.com/RimoraStudio/Aether>")
+set(CMAKE_PROJECT_CONTACT "Xeleste <maintainers@github.com/LanUAriesEchos/Meshflow>")
 set(CMAKE_PROJECT_REV_FQDN "org.meshflow.meshflow")
 
 #Unset the vars used in the project call

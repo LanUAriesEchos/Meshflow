@@ -32,6 +32,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
+#include <limits>
 #include <ctime>
 
 using namespace meshflow::server;
@@ -386,6 +387,171 @@ int32_t Server::getJumpZoneSize(const BaseClientProxy *client) const
   }
 }
 
+std::vector<Server::MonitorBox> Server::monitorBoxes(const BaseClientProxy *client) const
+{
+  const auto &rects = m_config->getMonitors(getName(client));
+  if (rects.size() < 2) {
+    return {};
+  }
+
+  int32_t ax;
+  int32_t ay;
+  int32_t aw;
+  int32_t ah;
+  client->getShape(ax, ay, aw, ah);
+
+  int32_t right = 0;
+  int32_t bottom = 0;
+  for (const auto &r : rects) {
+    right = std::max(right, r.x + r.w);
+    bottom = std::max(bottom, r.y + r.h);
+  }
+  // the configured layout must describe the screen the client actually reports
+  if (right != aw || bottom != ah) {
+    return {};
+  }
+
+  std::vector<MonitorBox> boxes;
+  boxes.reserve(rects.size());
+  for (const auto &r : rects) {
+    boxes.push_back({ax + r.x, ay + r.y, r.w, r.h});
+  }
+  return boxes;
+}
+
+bool Server::insideAny(const std::vector<MonitorBox> &boxes, int32_t x, int32_t y)
+{
+  return std::ranges::any_of(boxes, [x, y](const MonitorBox &b) { return b.contains(x, y); });
+}
+
+void Server::clampIntoMonitors(const BaseClientProxy *client, int32_t &x, int32_t &y, int32_t inset) const
+{
+  const auto boxes = monitorBoxes(client);
+  if (boxes.empty() || (inset == 0 && insideAny(boxes, x, y))) {
+    return;
+  }
+
+  int64_t best = std::numeric_limits<int64_t>::max();
+  int32_t bx = x;
+  int32_t by = y;
+  for (const auto &b : boxes) {
+    const int32_t i = std::min({inset, (b.w - 1) / 2, (b.h - 1) / 2});
+    const int32_t cx = std::clamp(x, b.x + i, b.x + b.w - 1 - i);
+    const int32_t cy = std::clamp(y, b.y + i, b.y + b.h - 1 - i);
+    const int64_t d = static_cast<int64_t>(cx - x) * (cx - x) + static_cast<int64_t>(cy - y) * (cy - y);
+    if (d < best) {
+      best = d;
+      bx = cx;
+      by = cy;
+    }
+  }
+  x = bx;
+  y = by;
+}
+
+Direction Server::monitorExitDirection(
+    const BaseClientProxy *client, int32_t xOld, int32_t yOld, int32_t &x, int32_t &y
+) const
+{
+  const auto boxes = monitorBoxes(client);
+  if (boxes.empty() || insideAny(boxes, x, y)) {
+    return Direction::NoDirection;
+  }
+
+  // monitor the cursor was on before it moved into empty space
+  int32_t cx = xOld;
+  int32_t cy = yOld;
+  clampIntoMonitors(client, cx, cy);
+  const MonitorBox *from = nullptr;
+  for (const auto &b : boxes) {
+    if (b.contains(cx, cy)) {
+      from = &b;
+      break;
+    }
+  }
+  if (from == nullptr) {
+    return Direction::NoDirection;
+  }
+
+  const int32_t ox = x < from->x ? from->x - x : (x >= from->x + from->w ? x - (from->x + from->w - 1) : 0);
+  const int32_t oy = y < from->y ? from->y - y : (y >= from->y + from->h ? y - (from->y + from->h - 1) : 0);
+  if (ox == 0 && oy == 0) {
+    return Direction::NoDirection;
+  }
+
+  int32_t ax;
+  int32_t ay;
+  int32_t aw;
+  int32_t ah;
+  client->getShape(ax, ay, aw, ah);
+
+  // report the position as if the cursor had left the bounding box at that spot, which is what
+  // the neighbor lookup expects
+  using enum Direction;
+  if (oy >= ox) {
+    x = std::clamp(x, from->x, from->x + from->w - 1);
+    const bool up = y < from->y;
+    y = up ? ay - 1 : ay + ah;
+    return up ? Top : Bottom;
+  }
+  y = std::clamp(y, from->y, from->y + from->h - 1);
+  const bool left = x < from->x;
+  x = left ? ax - 1 : ax + aw;
+  return left ? Left : Right;
+}
+
+void Server::monitorEdgeDirections(
+    const BaseClientProxy *client, int32_t x, int32_t y, int32_t zone, Direction &dirh, Direction &dirv, int32_t &xh,
+    int32_t &yv
+) const
+{
+  const auto boxes = monitorBoxes(client);
+  if (boxes.empty()) {
+    return;
+  }
+
+  int32_t cx = x;
+  int32_t cy = y;
+  clampIntoMonitors(client, cx, cy);
+  const MonitorBox *on = nullptr;
+  for (const auto &b : boxes) {
+    if (b.contains(cx, cy)) {
+      on = &b;
+      break;
+    }
+  }
+  if (on == nullptr) {
+    return;
+  }
+
+  int32_t ax;
+  int32_t ay;
+  int32_t aw;
+  int32_t ah;
+  client->getShape(ax, ay, aw, ah);
+
+  using enum Direction;
+  // an edge counts only where it faces empty space; edges shared with another monitor are free to cross
+  if (dirv == NoDirection) {
+    if (y < on->y + zone && !insideAny(boxes, x, on->y - 1)) {
+      dirv = Top;
+      yv = ay - 1;
+    } else if (y >= on->y + on->h - zone && !insideAny(boxes, x, on->y + on->h)) {
+      dirv = Bottom;
+      yv = ay + ah;
+    }
+  }
+  if (dirh == NoDirection) {
+    if (x < on->x + zone && !insideAny(boxes, on->x - 1, y)) {
+      dirh = Left;
+      xh = ax - 1;
+    } else if (x >= on->x + on->w - zone && !insideAny(boxes, on->x + on->w, y)) {
+      dirh = Right;
+      xh = ax + aw;
+    }
+  }
+}
+
 void Server::switchScreen(BaseClientProxy *dst, int32_t x, int32_t y, bool forScreensaver)
 {
   assert(dst != nullptr);
@@ -424,6 +590,9 @@ void Server::switchScreen(BaseClientProxy *dst, int32_t x, int32_t y, bool forSc
         y, dy + dh
     );
   }
+
+  // land on a real monitor, and away from the jump zone when entering the primary screen
+  clampIntoMonitors(dst, x, y, dst == m_primaryClient ? getJumpZoneSize(dst) : 0);
 
   assert(m_active != nullptr);
 
@@ -1665,6 +1834,7 @@ bool Server::onMouseMovePrimary(int32_t x, int32_t y)
     yv += zoneSize;
     dirv = Bottom;
   }
+  monitorEdgeDirections(m_active, x, y, zoneSize, dirh, dirv, xh, yv);
   if (dirh == NoDirection && dirv == NoDirection) {
     // still on local screen
     noSwitch(x, y);
@@ -1783,6 +1953,9 @@ void Server::onMouseMoveSecondary(int32_t dx, int32_t dy)
       dir = Top;
     } else if (m_y > ay + ah - 1) {
       dir = Bottom;
+    } else if (const Direction exit = monitorExitDirection(m_active, xOld, yOld, m_x, m_y); exit != NoDirection) {
+      // left an individual monitor into empty space inside the screen
+      dir = exit;
     } else {
       // we haven't left the screen
       newScreen = m_active;
@@ -1859,6 +2032,9 @@ void Server::onMouseMoveSecondary(int32_t dx, int32_t dy)
       m_y = ay + ah - 1;
       LOG_VERBOSE("clamp to bottom of \"%s\"", getName(m_active).c_str());
     }
+
+    // keep the cursor on a real monitor
+    clampIntoMonitors(m_active, m_x, m_y);
 
     // warp cursor if it moved.
     if (m_x != xOld || m_y != yOld) {

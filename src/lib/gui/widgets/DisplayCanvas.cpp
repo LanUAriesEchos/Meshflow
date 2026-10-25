@@ -21,13 +21,20 @@
 #include <QMimeData>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QSettings>
+#include <QWheelEvent>
 
 #include <algorithm>
+#include <cmath>
 
 namespace {
 constexpr int kSnapPixels = 10;
 constexpr int kRemoveDragMargin = 24;
 constexpr int kMargin = 16;
+constexpr qsizetype kMaxUndo = 100;
+constexpr qreal kMinZoom = 0.25;
+constexpr qreal kMaxZoom = 8.0;
+const auto kPresetGroup = QStringLiteral("displayPresets");
 } // namespace
 
 DisplayCanvas::DisplayCanvas(QWidget *parent) : QWidget(parent)
@@ -38,6 +45,7 @@ DisplayCanvas::DisplayCanvas(QWidget *parent) : QWidget(parent)
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   setToolTip(
       tr("Drag a monitor to arrange it. Hold Shift to move the whole computer, Ctrl to move without snapping.\n"
+         "Mouse wheel zooms, drag empty space (or the middle button) to pan, Ctrl+0 resets the view. Ctrl+Z / Ctrl+Y undo and redo.\n"
          "Arrow keys nudge the selected monitor by 1 pixel (Shift: 10 pixels). Double click for the computer's settings.")
   );
 }
@@ -110,6 +118,8 @@ bool DisplayCanvas::commitMonitors(int slot, const QList<QRect> &monitors)
   if (monitors.isEmpty())
     return false;
 
+  pushUndo();
+
   QRect bounds;
   for (const QRect &m : monitors)
     bounds = bounds.united(m);
@@ -135,11 +145,17 @@ int DisplayCanvas::selectedMonitor() const
   return count == 0 ? -1 : static_cast<int>(std::clamp<qsizetype>(m_selectedMonitor, 0, count - 1));
 }
 
+// Real monitor rectangles of every other computer. Using monitors (not bounding boxes) lets a display
+// sit in the empty corner of an L-shaped or staggered computer.
 QList<QRect> DisplayCanvas::othersOf(int slot) const
 {
-  auto rects = currentRects();
-  if (slot >= 0 && slot < rects.size())
-    rects[slot] = QRect();
+  QList<QRect> rects;
+  if (!m_model)
+    return rects;
+  for (int i = 0; i < screens().size(); i++) {
+    if (i != slot)
+      rects.append(monitorsFor(i));
+  }
   return rects;
 }
 
@@ -275,11 +291,11 @@ bool DisplayCanvas::setSelectedMonitorCount(int count)
     }
   }
 
-  QRect bounds;
-  for (const QRect &m : monitors)
-    bounds = bounds.united(m);
-  if (displaylayout::overlapsAny(bounds, othersOf(m_selected)))
-    return false;
+  const auto others = othersOf(m_selected);
+  for (const QRect &m : monitors) {
+    if (displaylayout::overlapsAny(m, others))
+      return false;
+  }
 
   m_selectedMonitor = newSelection;
   return commitMonitors(m_selected, monitors);
@@ -317,6 +333,203 @@ void DisplayCanvas::updateTransform()
       kMargin + (availW - padded.width() * m_scale) / 2.0 - padded.x() * m_scale,
       kMargin + (availH - padded.height() * m_scale) / 2.0 - padded.y() * m_scale
   );
+
+  if (m_zoom != 1.0 || !m_pan.isNull()) {
+    const QPointF center(width() / 2.0, height() / 2.0);
+    m_offset = center - (center - m_offset) * m_zoom + m_pan;
+    m_scale *= m_zoom;
+  }
+}
+
+void DisplayCanvas::resetView()
+{
+  m_zoom = 1.0;
+  m_pan = QPointF();
+  updateTransform();
+  update();
+}
+
+void DisplayCanvas::wheelEvent(QWheelEvent *event)
+{
+  if (m_frozen || event->angleDelta().y() == 0) {
+    QWidget::wheelEvent(event);
+    return;
+  }
+
+  const QPointF pos = event->position();
+  const QPointF anchor = toVirtual(pos);
+  m_zoom = std::clamp(m_zoom * std::pow(1.0015, event->angleDelta().y()), kMinZoom, kMaxZoom);
+  updateTransform();
+  // keep the point under the cursor fixed while zooming
+  const QPointF moved(anchor.x() * m_scale + m_offset.x(), anchor.y() * m_scale + m_offset.y());
+  m_pan += pos - moved;
+  updateTransform();
+  update();
+  event->accept();
+}
+
+void DisplayCanvas::pushUndo()
+{
+  if (!m_model)
+    return;
+  m_undo.append(screens());
+  if (m_undo.size() > kMaxUndo)
+    m_undo.removeFirst();
+  m_redo.clear();
+  Q_EMIT historyChanged();
+}
+
+void DisplayCanvas::clearHistory()
+{
+  m_undo.clear();
+  m_redo.clear();
+  Q_EMIT historyChanged();
+}
+
+void DisplayCanvas::undo()
+{
+  if (!m_model || m_undo.isEmpty())
+    return;
+  endDrag(false);
+  m_redo.append(screens());
+  screens() = m_undo.takeLast();
+  refresh();
+  Q_EMIT m_model->screensChanged();
+  Q_EMIT geometryEdited();
+  Q_EMIT screenRemoved();
+  Q_EMIT historyChanged();
+}
+
+void DisplayCanvas::redo()
+{
+  if (!m_model || m_redo.isEmpty())
+    return;
+  endDrag(false);
+  m_undo.append(screens());
+  screens() = m_redo.takeLast();
+  refresh();
+  Q_EMIT m_model->screensChanged();
+  Q_EMIT geometryEdited();
+  Q_EMIT screenRemoved();
+  Q_EMIT historyChanged();
+}
+
+QStringList DisplayCanvas::presetNames()
+{
+  QSettings s;
+  s.beginGroup(kPresetGroup);
+  return s.childGroups();
+}
+
+void DisplayCanvas::savePreset(const QString &name) const
+{
+  if (!m_model || name.trimmed().isEmpty())
+    return;
+
+  QSettings s;
+  s.beginGroup(kPresetGroup);
+  s.remove(name);
+  s.beginGroup(name);
+  int n = 0;
+  for (int i = 0; i < screens().size(); i++) {
+    const Screen &screen = screens().at(i);
+    if (screen.isNull())
+      continue;
+    const QList<QRect> monitors = storedMonitors(i);
+    QStringList rects;
+    for (const QRect &m : monitors)
+      rects << QStringLiteral("%1,%2,%3,%4").arg(m.x()).arg(m.y()).arg(m.width()).arg(m.height());
+    s.setValue(QStringLiteral("screen%1").arg(n++), screen.name() + QLatin1Char('|') + rects.join(QLatin1Char(';')));
+  }
+  s.setValue(QStringLiteral("count"), n);
+}
+
+bool DisplayCanvas::loadPreset(const QString &name)
+{
+  if (!m_model)
+    return false;
+
+  QSettings s;
+  s.beginGroup(kPresetGroup);
+  s.beginGroup(name);
+  const int n = s.value(QStringLiteral("count"), 0).toInt();
+
+  ScreenList updated = screens();
+  int applied = 0;
+  for (int k = 0; k < n; k++) {
+    const QStringList parts = s.value(QStringLiteral("screen%1").arg(k)).toString().split(QLatin1Char('|'));
+    if (parts.size() != 2)
+      continue;
+    int slot = -1;
+    for (int i = 0; i < updated.size(); i++) {
+      if (!updated.at(i).isNull() && updated.at(i).name() == parts.at(0)) {
+        slot = i;
+        break;
+      }
+    }
+    if (slot < 0)
+      continue;
+
+    QList<QRect> monitors;
+    for (const QString &r : parts.at(1).split(QLatin1Char(';'), Qt::SkipEmptyParts)) {
+      const QStringList v = r.split(QLatin1Char(','));
+      if (v.size() == 4)
+        monitors.append(QRect(v[0].toInt(), v[1].toInt(), v[2].toInt(), v[3].toInt()));
+    }
+    if (monitors.isEmpty())
+      continue;
+
+    QRect bounds;
+    for (const QRect &m : monitors)
+      bounds = bounds.united(m);
+    QList<QRect> relative;
+    if (monitors.size() > 1) {
+      for (const QRect &m : monitors)
+        relative.append(m.translated(-bounds.topLeft()));
+    }
+    updated[slot].setMonitors(relative);
+    updated[slot].setGeometry(bounds);
+    applied++;
+  }
+  if (applied == 0)
+    return false;
+
+  // computers that are not part of the preset must not collide with the restored ones
+  QList<QList<QRect>> groups;
+  for (const Screen &sc : std::as_const(updated)) {
+    if (sc.isNull() || !sc.hasGeometry())
+      continue;
+    QList<QRect> g;
+    if (sc.monitors().isEmpty()) {
+      g.append(sc.geometry());
+    } else {
+      for (const QRect &m : sc.monitors())
+        g.append(m.translated(sc.geometry().topLeft()));
+    }
+    groups.append(g);
+  }
+  for (int i = 0; i < groups.size(); i++) {
+    for (int j = i + 1; j < groups.size(); j++) {
+      for (const QRect &a : groups[i]) {
+        if (displaylayout::overlapsAny(a, groups[j]))
+          return false;
+      }
+    }
+  }
+
+  pushUndo();
+  screens() = updated;
+  refresh();
+  Q_EMIT m_model->screensChanged();
+  Q_EMIT geometryEdited();
+  return true;
+}
+
+void DisplayCanvas::deletePreset(const QString &name)
+{
+  QSettings s;
+  s.beginGroup(kPresetGroup);
+  s.remove(name);
 }
 
 QRectF DisplayCanvas::toView(const QRect &rect) const
@@ -461,13 +674,24 @@ void DisplayCanvas::paintEvent(QPaintEvent *)
 void DisplayCanvas::mousePressEvent(QMouseEvent *event)
 {
   setFocus();
-  if (event->button() != Qt::LeftButton || !m_model)
+  if (!m_model)
+    return;
+  if (event->button() == Qt::MiddleButton) {
+    m_panning = true;
+    m_panLast = event->pos();
+    setCursor(Qt::ClosedHandCursor);
+    return;
+  }
+  if (event->button() != Qt::LeftButton)
     return;
 
   const int slot = slotAt(event->pos());
   select(slot, slot < 0 ? -1 : monitorAt(slot, event->pos()));
-  if (slot < 0)
+  if (slot < 0) {
+    m_panning = true;
+    m_panLast = event->pos();
     return;
+  }
 
   m_dragSlot = slot;
   m_dragStart = event->pos();
@@ -483,6 +707,13 @@ void DisplayCanvas::mousePressEvent(QMouseEvent *event)
 
 void DisplayCanvas::mouseMoveEvent(QMouseEvent *event)
 {
+  if (m_panning) {
+    m_pan += event->pos() - m_panLast;
+    m_panLast = event->pos();
+    updateTransform();
+    update();
+    return;
+  }
   if (m_dragSlot < 0 || !(event->buttons() & Qt::LeftButton))
     return;
 
@@ -518,15 +749,25 @@ void DisplayCanvas::mouseMoveEvent(QMouseEvent *event)
     QRect bounds;
     for (const QRect &m : monitors)
       bounds = bounds.united(m);
-    m_dragValid = !displaylayout::overlapsAny(bounds, others) && !displaylayout::overlapsAny(moved, siblings);
+    m_dragValid = !displaylayout::overlapsAny(moved, others) && !displaylayout::overlapsAny(moved, siblings);
   } else {
-    m_dragValid = !displaylayout::overlapsAny(moved, others);
+    const QPoint shift = moved.topLeft() - slotRect(m_dragSlot).topLeft();
+    m_dragValid = true;
+    for (const QRect &m : storedMonitors(m_dragSlot)) {
+      if (displaylayout::overlapsAny(m.translated(shift), others))
+        m_dragValid = false;
+    }
   }
   update();
 }
 
 void DisplayCanvas::mouseReleaseEvent(QMouseEvent *event)
 {
+  if (m_panning && (event->button() == Qt::MiddleButton || event->button() == Qt::LeftButton)) {
+    m_panning = false;
+    unsetCursor();
+    return;
+  }
   if (event->button() == Qt::LeftButton)
     endDrag(true);
 }
@@ -550,6 +791,7 @@ void DisplayCanvas::endDrag(bool commit)
       monitors[monitor] = target;
       commitMonitors(slot, monitors);
     } else {
+      pushUndo();
       screens()[slot].setGeometry(target);
       Q_EMIT m_model->screensChanged();
       Q_EMIT geometryEdited();
@@ -579,6 +821,7 @@ void DisplayCanvas::startRemovalDrag()
 
   endDrag(false);
   if (drag->exec(Qt::MoveAction, Qt::MoveAction) == Qt::MoveAction) {
+    pushUndo();
     screens()[slot] = Screen();
     m_selected = -1;
     Q_EMIT m_model->screensChanged();
@@ -593,6 +836,8 @@ void DisplayCanvas::mouseDoubleClickEvent(QMouseEvent *event)
   endDrag(false);
   if (slotAt(event->pos()) >= 0)
     editSelected();
+  else
+    resetView();
 }
 
 void DisplayCanvas::editSelected()
@@ -600,8 +845,14 @@ void DisplayCanvas::editSelected()
   if (!m_model || m_selected < 0 || slotRect(m_selected).isNull())
     return;
 
+  const ScreenList before = screens();
   ScreenSettingsDialog dlg(this, &screens()[m_selected], &screens());
   dlg.exec();
+  if (!(screens() == before)) {
+    m_undo.append(before);
+    m_redo.clear();
+    Q_EMIT historyChanged();
+  }
   Q_EMIT m_model->screensChanged();
 }
 
@@ -610,6 +861,7 @@ void DisplayCanvas::removeSelected()
   if (!m_model || m_selected < 0 || slotRect(m_selected).isNull())
     return;
 
+  pushUndo();
   screens()[m_selected] = Screen();
   m_selected = -1;
   Q_EMIT m_model->screensChanged();
@@ -632,7 +884,8 @@ bool DisplayCanvas::setSelectedGeometry(const QRect &geometry)
   QRect bounds;
   for (const QRect &m : monitors)
     bounds = bounds.united(m);
-  if (displaylayout::overlapsAny(bounds, othersOf(m_selected)))
+  const auto others = othersOf(m_selected);
+  if (displaylayout::overlapsAny(geometry, others))
     return false;
 
   auto siblings = monitors;
@@ -645,6 +898,19 @@ bool DisplayCanvas::setSelectedGeometry(const QRect &geometry)
 
 void DisplayCanvas::keyPressEvent(QKeyEvent *event)
 {
+  if (event->matches(QKeySequence::Undo)) {
+    undo();
+    return;
+  }
+  if (event->matches(QKeySequence::Redo) || (event->key() == Qt::Key_Y && (event->modifiers() & Qt::ControlModifier))) {
+    redo();
+    return;
+  }
+  if (event->key() == Qt::Key_0 && (event->modifiers() & Qt::ControlModifier)) {
+    resetView();
+    return;
+  }
+
   if (m_selected < 0) {
     QWidget::keyPressEvent(event);
     return;
@@ -716,13 +982,13 @@ void DisplayCanvas::dragMoveEvent(QDragMoveEvent *event)
 
 QRect DisplayCanvas::findFreeRect(const QRect &wanted) const
 {
-  const auto others = currentRects();
+  const auto others = othersOf(-1);
   const QRect snapped = m_snap ? displaylayout::snap(wanted, others, std::max(1, qRound(kSnapPixels / m_scale))) : wanted;
   if (!displaylayout::overlapsAny(snapped, others))
     return snapped;
 
   QRect bounds;
-  for (const auto &r : others)
+  for (const auto &r : currentRects())
     bounds = bounds.united(r);
   return QRect(bounds.x() + bounds.width(), bounds.y(), wanted.width(), wanted.height());
 }
@@ -759,6 +1025,7 @@ void DisplayCanvas::dropEvent(QDropEvent *event)
       displaylayout::kDefaultWidth, displaylayout::kDefaultHeight
   );
   dropped.setGeometry(findFreeRect(wanted));
+  pushUndo();
   screens()[slot] = dropped;
   m_selected = slot;
 

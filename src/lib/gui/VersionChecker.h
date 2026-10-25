@@ -22,6 +22,8 @@ public Q_SLOTS:
   void replyFinished(QNetworkReply *reply);
 Q_SIGNALS:
   void updateFound(const QString &version);
+  // emitted after every check: error is empty on success; version is the newest release seen
+  void checkFinished(bool updateAvailable, const QString &version, const QString &error);
 
 private:
   static int compareVersions(const QString &left, const QString &right);

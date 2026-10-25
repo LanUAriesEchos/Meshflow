@@ -43,6 +43,9 @@ void VersionChecker::replyFinished(QNetworkReply *reply)
     qWarning("version check server error: %s", qPrintable(reply->errorString()));
     qWarning("version check server response: %s", qPrintable(QString(reply->readAll())));
     qWarning("error checking for updates, http status: %d", httpStatus);
+    const auto error = httpStatus == 404 ? tr("No releases have been published yet.") : reply->errorString();
+    reply->deleteLater();
+    Q_EMIT checkFinished(false, QString(), error);
     return;
   }
 
@@ -59,6 +62,7 @@ void VersionChecker::replyFinished(QNetworkReply *reply)
 
   if (newestVersion.isEmpty()) {
     qWarning() << "version check response has no tag_name";
+    Q_EMIT checkFinished(false, QString(), tr("The server response did not contain a version."));
     return;
   }
 
@@ -66,8 +70,10 @@ void VersionChecker::replyFinished(QNetworkReply *reply)
     qWarning().noquote() //
         << QStringLiteral("current version %1 out of date, update available: %2").arg(kVersion, newestVersion);
     Q_EMIT updateFound(newestVersion);
+    Q_EMIT checkFinished(true, newestVersion, QString());
   } else {
     qDebug().noquote() << QStringLiteral("current version %1 is upto date").arg(kVersion);
+    Q_EMIT checkFinished(false, newestVersion, QString());
   }
 }
 

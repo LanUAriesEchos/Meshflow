@@ -125,7 +125,7 @@ void IpcServer::processMessage(QLocalSocket *clientSocket, const QString &messag
       return;
     }
 
-    const auto versionId = QStringLiteral("%1+%2").arg(kVersion, kVersionGitSha);
+    const auto versionId = QString::fromLatin1(kVersion);
     const auto clientVersion = parts.at(1);
     LOG_DEBUG("%s ipc server got hello message (version: %s)", m_typeName.constData(), versionId.toUtf8().constData());
 

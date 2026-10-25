@@ -98,6 +98,7 @@ private:
   void clearSettings();
   void openAboutDialog();
   void openGetNewVersionUrl() const;
+  void checkForUpdatesManually();
   void openSettings();
   void startCore();
   void stopCore();
@@ -207,6 +208,8 @@ private:
   QAction *m_actionRestartCore = nullptr;
   QAction *m_actionStopCore = nullptr;
   QAction *m_actionShowHelp = nullptr;
+  QAction *m_actionCheckUpdates = nullptr;
+  bool m_manualUpdateCheck = false;
 
   // Network monitoring
   NetworkMonitor *m_networkMonitor = nullptr;

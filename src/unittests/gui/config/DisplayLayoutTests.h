@@ -20,4 +20,5 @@ private Q_SLOTS:
   void isolatedScreens();
   void intervalFormatting();
   void multiMonitorLinksUseOuterEdges();
+  void innerEdgeAboveCenterMonitorLinks();
 };

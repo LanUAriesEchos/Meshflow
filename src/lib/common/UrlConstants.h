@@ -14,11 +14,11 @@
 const auto kOrgDomain = QStringLiteral("github.com/RimoraStudio/Aether");
 
 const auto kUrlSourceQuery = QStringLiteral("source=gui");
-const auto kUrlApp = QStringLiteral("https://%1").arg(kOrgDomain);
-const auto kUrlHelp = QStringLiteral("%1/help?%2").arg(kUrlApp, kUrlSourceQuery);
-const auto kUrlDownload = QStringLiteral("%1/download?%2").arg(kUrlApp, kUrlSourceQuery);
-const auto kUrlWiki = QStringLiteral("%1/wiki?%2").arg(kUrlApp, kUrlSourceQuery);
-const auto kUrlUpdateCheck = QStringLiteral("https://api.github.com/repos/RimoraStudio/Aether/releases/latest");
+const auto kUrlApp = QStringLiteral("https://github.com/LanUAriesEchos/Meshflow");
+const auto kUrlHelp = QStringLiteral("%1#readme").arg(kUrlApp);
+const auto kUrlDownload = QStringLiteral("%1/releases/latest").arg(kUrlApp);
+const auto kUrlWiki = QStringLiteral("%1/wiki").arg(kUrlApp);
+const auto kUrlUpdateCheck = QStringLiteral("https://api.github.com/repos/LanUAriesEchos/Meshflow/releases/latest");
 
 #if defined(Q_OS_LINUX)
 const auto kUrlGnomeTrayFix = QStringLiteral("https://extensions.gnome.org/extension/615/appindicator-support/");

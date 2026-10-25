@@ -70,7 +70,7 @@ void IpcClient::attemptConnection()
   connect(
       m_socket, &QLocalSocket::connected, this,
       [this] {
-        const auto versionId = QStringLiteral("%1+%2").arg(kVersion, kVersionGitSha);
+        const auto versionId = QString::fromLatin1(kVersion);
         m_socket->write(QStringLiteral("hello=%1\n").arg(versionId).toUtf8());
         qDebug().noquote() << QStringLiteral("%1 ipc client sent hello with version: %2").arg(m_typeName, versionId);
       },
@@ -176,7 +176,7 @@ void IpcClient::handleHandshakeMessage(const QStringList &parts)
     return;
   }
 
-  const auto versionId = QStringLiteral("%1+%2").arg(kVersion, kVersionGitSha);
+  const auto versionId = QString::fromLatin1(kVersion);
 
   if (parts.at(0) == QStringLiteral("versionMismatch")) {
     const auto serverVersion = parts.size() >= 2 ? parts.at(1) : QStringLiteral("unknown");

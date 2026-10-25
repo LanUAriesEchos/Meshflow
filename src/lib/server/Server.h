@@ -262,6 +262,30 @@ private:
   // after entering the client in the given direction.
   void avoidJumpZone(const BaseClientProxy *, Direction, int32_t &x, int32_t &y) const;
 
+  // Physical monitor layout of a screen. Lets the cursor cross at the edge of an individual monitor
+  // that faces empty space inside the screen's bounding box (e.g. the middle monitor of a staggered setup).
+  struct MonitorBox
+  {
+    int32_t x;
+    int32_t y;
+    int32_t w;
+    int32_t h;
+    bool contains(int32_t px, int32_t py) const
+    {
+      return px >= x && px < x + w && py >= y && py < y + h;
+    }
+  };
+  std::vector<MonitorBox> monitorBoxes(const BaseClientProxy *client) const;
+  static bool insideAny(const std::vector<MonitorBox> &boxes, int32_t x, int32_t y);
+  void clampIntoMonitors(const BaseClientProxy *client, int32_t &x, int32_t &y, int32_t inset = 0) const;
+  Direction monitorExitDirection(
+      const BaseClientProxy *client, int32_t xOld, int32_t yOld, int32_t &x, int32_t &y
+  ) const;
+  void monitorEdgeDirections(
+      const BaseClientProxy *client, int32_t x, int32_t y, int32_t zone, Direction &dirh, Direction &dirv, int32_t &xh,
+      int32_t &yv
+  ) const;
+
   // test if a switch is permitted.  this includes testing user
   // options like switch delay and tracking any state required to
   // implement them.  returns true iff a switch is permitted.

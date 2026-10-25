@@ -11,6 +11,8 @@
 
 class QCheckBox;
 class QLabel;
+class QMenu;
+class QToolButton;
 class QPushButton;
 class QSpinBox;
 class DisplayCanvas;
@@ -26,6 +28,8 @@ public:
   void setModel(ScreenSetupModel *model);
   ScreenSetupModel *model() const;
   void reset();
+  void recordUndo();
+  void clearHistory();
 
 Q_SIGNALS:
   void screenRemoved();
@@ -33,6 +37,8 @@ Q_SIGNALS:
 
 private:
   void syncPanel();
+  void updateHistoryButtons();
+  void populatePresetMenu();
   void applyGeometryFromFields();
 
   DisplayCanvas *m_canvas;
@@ -47,4 +53,9 @@ private:
   QPushButton *m_settings;
   QPushButton *m_remove;
   QPushButton *m_detect;
+  QPushButton *m_undo;
+  QPushButton *m_redo;
+  QPushButton *m_fit;
+  QToolButton *m_presets;
+  QMenu *m_presetMenu;
 };

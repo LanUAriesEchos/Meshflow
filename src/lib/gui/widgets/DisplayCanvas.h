@@ -9,12 +9,13 @@
 #include <QHash>
 #include <QList>
 #include <QRect>
+#include <QStringList>
 #include <QWidget>
 
 #include "gui/config/DisplayLayout.h"
+#include "gui/config/ScreenList.h"
 
 class ScreenSetupModel;
-class ScreenList;
 
 /// @brief Free-form canvas that shows the computers as numbered rectangles on a shared virtual desktop,
 /// like the Windows display settings page.
@@ -66,15 +67,38 @@ public:
   void editSelected();
   void removeSelected();
 
+  /// Records the current arrangement so that the next change can be undone. Call before changing screens externally.
+  void pushUndo();
+  void clearHistory();
+  bool canUndo() const
+  {
+    return !m_undo.isEmpty();
+  }
+  bool canRedo() const
+  {
+    return !m_redo.isEmpty();
+  }
+
+  /// Named arrangements, saved between sessions and matched to computers by name.
+  static QStringList presetNames();
+  void savePreset(const QString &name) const;
+  bool loadPreset(const QString &name);
+  static void deletePreset(const QString &name);
+
 public Q_SLOTS:
   void refresh();
+  void undo();
+  void redo();
+  void resetView();
 
 Q_SIGNALS:
   void selectionChanged();
   void geometryEdited();
   void screenRemoved();
+  void historyChanged();
 
 protected:
+  void wheelEvent(QWheelEvent *event) override;
   void paintEvent(QPaintEvent *event) override;
   void mousePressEvent(QMouseEvent *event) override;
   void mouseMoveEvent(QMouseEvent *event) override;
@@ -113,6 +137,14 @@ private:
   qreal m_scale = 0.1;
   QPointF m_offset;
   bool m_frozen = false;
+
+  qreal m_zoom = 1.0;
+  QPointF m_pan;
+  bool m_panning = false;
+  QPoint m_panLast;
+
+  QList<ScreenList> m_undo;
+  QList<ScreenList> m_redo;
 
   int m_dragSlot = -1;
   int m_dragMonitor = -1;

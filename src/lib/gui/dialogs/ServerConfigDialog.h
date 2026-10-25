@@ -42,6 +42,8 @@ protected:
 
   void addHotkey();
   void editHotkey();
+  void addLockHotkey();
+  void setupLiveDisplayDetection();
   void removeHotkey();
   void listHotkeysSelectionChanged(const QItemSelection &selected, [[maybe_unused]] const QItemSelection &deselected);
 

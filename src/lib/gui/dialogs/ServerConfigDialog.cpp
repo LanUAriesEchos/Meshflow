@@ -19,6 +19,9 @@
 #include "gui/widgets/SettingsDialogButtonBox.h"
 
 #include <QFileDialog>
+#include <QGuiApplication>
+#include <QScreen>
+#include <QTimer>
 #include <QMessageBox>
 
 using enum ScreenConfig::SwitchCorner;
@@ -49,6 +52,7 @@ ServerConfigDialog::ServerConfigDialog(QWidget *parent, ServerConfig &config)
   if (!meshflow::platform::isWindows())
     ui->cbWin32KeepForeground->setVisible(false);
   initConnections();
+  setupLiveDisplayDetection();
 }
 
 ServerConfigDialog::~ServerConfigDialog() = default;
@@ -116,6 +120,22 @@ void ServerConfigDialog::cancel()
 void ServerConfigDialog::addHotkey()
 {
   Hotkey hotkey;
+  HotkeyDialog dlg(this, hotkey);
+  if (dlg.exec() == QDialog::Accepted) {
+    serverConfig().hotkeys().append(hotkey);
+    ui->listHotkeys->addItem(hotkey.text());
+    setButtonBoxEnabledButtons();
+  }
+}
+
+void ServerConfigDialog::addLockHotkey()
+{
+  Action lock;
+  lock.setType(static_cast<int>(Action::Type::lockCursorToScreen));
+  lock.setLockCursorMode(static_cast<int>(Action::LockCursorMode::toggle));
+
+  Hotkey hotkey;
+  hotkey.addAction(lock);
   HotkeyDialog dlg(this, hotkey);
   if (dlg.exec() == QDialog::Accepted) {
     serverConfig().hotkeys().append(hotkey);
@@ -427,8 +447,27 @@ void ServerConfigDialog::loadFromConfig()
   updateControls();
 }
 
+void ServerConfigDialog::setupLiveDisplayDetection()
+{
+  // monitors plugged in, unplugged or re-arranged in the OS update this PC's layout automatically
+  auto *timer = new QTimer(this);
+  timer->setSingleShot(true);
+  timer->setInterval(800);
+  connect(timer, &QTimer::timeout, this, &ServerConfigDialog::detectDisplays);
+
+  const auto watch = [timer](QScreen *screen) {
+    timer->start();
+    connect(screen, &QScreen::geometryChanged, timer, qOverload<>(&QTimer::start));
+  };
+  for (QScreen *screen : QGuiApplication::screens())
+    connect(screen, &QScreen::geometryChanged, timer, qOverload<>(&QTimer::start));
+  connect(qApp, &QGuiApplication::screenAdded, this, watch);
+  connect(qApp, &QGuiApplication::screenRemoved, timer, qOverload<>(&QTimer::start));
+}
+
 void ServerConfigDialog::detectDisplays()
 {
+  ui->screenSetupView->recordUndo();
   m_serverConfig.detectLocalMonitors();
   ui->screenSetupView->reset();
   updateControls();
@@ -436,6 +475,7 @@ void ServerConfigDialog::detectDisplays()
 
 void ServerConfigDialog::resetFromSettings()
 {
+  ui->screenSetupView->clearHistory();
   m_serverConfig = m_originalServerConfig;
   m_serverConfig.setConfigFile(m_originalServerConfigUsesExternalFile);
   m_serverConfig.setUseExternalConfig(m_originalServerConfigIsExternal);
@@ -481,6 +521,7 @@ void ServerConfigDialog::initConnections() const
   connect(ui->screenSetupView, &ScreenSetupView::screenRemoved, this, &ServerConfigDialog::onScreenRemoved);
   connect(ui->screenSetupView, &ScreenSetupView::detectRequested, this, &ServerConfigDialog::detectDisplays);
   connect(ui->btnNewHotkey, &QPushButton::clicked, this, &ServerConfigDialog::addHotkey);
+  connect(ui->btnLockHotkey, &QPushButton::clicked, this, &ServerConfigDialog::addLockHotkey);
   connect(ui->btnEditHotkey, &QPushButton::clicked, this, &ServerConfigDialog::editHotkey);
   connect(ui->btnRemoveHotkey, &QPushButton::clicked, this, &ServerConfigDialog::removeHotkey);
   connect(ui->listHotkeys, &QListView::doubleClicked, this, &ServerConfigDialog::editHotkey);
