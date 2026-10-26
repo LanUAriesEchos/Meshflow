@@ -1,5 +1,5 @@
 {
-    "org.meshflow.meshflow": [
+    "io.github.LanUAriesEchos.Meshflow": [
         "appstream-external-screenshot-url",
         "appstream-screenshots-not-mirrored-in-ostree"
     ]

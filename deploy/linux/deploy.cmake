@@ -12,11 +12,11 @@ install(
 )
 
 # Install our icon
-install(FILES ${MY_DIR}/org.meshflow.meshflow.png DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/512x512/apps/)
+install(FILES ${MY_DIR}/io.github.LanUAriesEchos.Meshflow.png DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/512x512/apps/)
 
 # Install our symbolic icon
 install(
-  FILES ${CMAKE_SOURCE_DIR}/src/apps/res/icons/meshflow-light/apps/64/org.meshflow.meshflow-symbolic.svg
+  FILES ${CMAKE_SOURCE_DIR}/src/apps/res/icons/meshflow-light/apps/64/io.github.LanUAriesEchos.Meshflow-symbolic.svg
   DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/symbolic/apps/
 )
 

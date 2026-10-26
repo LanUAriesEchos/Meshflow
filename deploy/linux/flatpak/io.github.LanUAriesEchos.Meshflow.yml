@@ -1,4 +1,4 @@
-app-id: org.meshflow.meshflow
+app-id: io.github.LanUAriesEchos.Meshflow
 runtime: org.kde.Platform
 runtime-version: "6.11"
 sdk: org.kde.Sdk
@@ -70,7 +70,15 @@ modules:
     buildsystem: cmake-ninja
     config-opts:
       - "-DCMAKE_BUILD_TYPE=Release"
+      # Flathub builds offline: Qlementine is provided as a source below instead of being fetched by CMake
+      - "-DFETCHCONTENT_FULLY_DISCONNECTED=ON"
+      - "-DFETCHCONTENT_SOURCE_DIR_QLEMENTINE=/run/build/meshflow/qlementine"
     sources:
       - type: dir
         path: ../../../
+      - type: git
+        url: https://github.com/oclero/qlementine.git
+        tag: v1.4.2
+        commit: 13f72eb8b53bafd9ac24e5562d8ddc28d5440469
+        dest: qlementine
 

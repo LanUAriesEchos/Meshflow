@@ -7,7 +7,7 @@
 # the user's own GUI session and accessibility permission.
 
 APP="/Applications/Meshflow.app"
-PLIST="/Library/LaunchAgents/org.meshflow.meshflow.plist"
+PLIST="/Library/LaunchAgents/io.github.LanUAriesEchos.Meshflow.plist"
 
 mkdir -p /Library/LaunchAgents
 cat > "$PLIST" <<EOF
@@ -16,7 +16,7 @@ cat > "$PLIST" <<EOF
 <plist version="1.0">
 <dict>
 	<key>Label</key>
-	<string>org.meshflow.meshflow</string>
+	<string>io.github.LanUAriesEchos.Meshflow</string>
 	<key>ProgramArguments</key>
 	<array>
 		<string>$APP/Contents/MacOS/meshflow</string>

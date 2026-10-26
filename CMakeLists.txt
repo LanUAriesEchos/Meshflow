@@ -103,7 +103,7 @@ set(CMAKE_PROJECT_PROPER_NAME "Meshflow")
 set(CMAKE_PROJECT_VENDOR "Rimora Studio")
 set(CMAKE_PROJECT_COPYRIGHT "(C) 2025 - 2026 ${CMAKE_PROJECT_VENDOR}")
 set(CMAKE_PROJECT_CONTACT "Xeleste <maintainers@github.com/LanUAriesEchos/Meshflow>")
-set(CMAKE_PROJECT_REV_FQDN "org.meshflow.meshflow")
+set(CMAKE_PROJECT_REV_FQDN "io.github.LanUAriesEchos.Meshflow")
 
 #Unset the vars used in the project call
 unset(MESHFLOW_VERSION_MAJOR)

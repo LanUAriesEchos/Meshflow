@@ -2,7 +2,7 @@
   "$comment": "Generated file do not hand edit",
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "meshflow",
-  "version": "1.0.1.0",
+  "version": "1.0.2.0",
   "builtin-baseline": "d5ec528843d29e3a52d745a64b469f810b2cedbf",
   "dependencies": [
     "openssl"

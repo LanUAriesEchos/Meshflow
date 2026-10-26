@@ -72,8 +72,8 @@
         <file>icons/meshflow-dark/actions/32/help-about.svg</file>
         <file>icons/meshflow-dark/actions/32/view-refresh.svg</file>
         <file>icons/meshflow-dark/actions/32/system-search.svg</file>
-        <file>icons/meshflow-dark/apps/64/org.meshflow.meshflow.svg</file>
-        <file>icons/meshflow-dark/apps/64/org.meshflow.meshflow-symbolic.svg</file>
+        <file>icons/meshflow-dark/apps/64/io.github.LanUAriesEchos.Meshflow.svg</file>
+        <file>icons/meshflow-dark/apps/64/io.github.LanUAriesEchos.Meshflow-symbolic.svg</file>
         <file>icons/meshflow-dark/devices/64/video-display.svg</file>
         <file>icons/meshflow-dark/places/64/user-trash.svg</file>
         <file>icons/meshflow-dark/status/32/software-updates-release.svg</file>
@@ -160,8 +160,8 @@
         <file>icons/meshflow-light/actions/32/help-about.svg</file>
         <file>icons/meshflow-light/actions/32/view-refresh.svg</file>
         <file>icons/meshflow-light/actions/32/system-search.svg</file>
-        <file>icons/meshflow-light/apps/64/org.meshflow.meshflow.svg</file>
-        <file>icons/meshflow-light/apps/64/org.meshflow.meshflow-symbolic.svg</file>
+        <file>icons/meshflow-light/apps/64/io.github.LanUAriesEchos.Meshflow.svg</file>
+        <file>icons/meshflow-light/apps/64/io.github.LanUAriesEchos.Meshflow-symbolic.svg</file>
         <file>icons/meshflow-light/devices/64/video-display.svg</file>
         <file>icons/meshflow-light/status/32/software-updates-release.svg</file>
         <file>icons/meshflow-light/status/64/dialog-error.svg</file>
